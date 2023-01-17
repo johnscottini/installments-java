@@ -1,14 +1,16 @@
 package application;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Scanner;
 
-import model.entities.CarRental;
-import model.entities.Vehicle;
-import model.services.BrazilTaxService;
-import model.services.RentalService;
+import model.entities.Contract;
+import model.entities.Installment;
+import model.services.PaymentService;
+import model.services.PaypalTaxService;
+
 import model.services.TaxService;
 
 public class Program {
@@ -16,25 +18,28 @@ public class Program {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		Locale.setDefault(Locale.US);
-		final DateTimeFormatter for1 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-		System.err.println("Enter rental data");
-		System.out.println("Car model: ");
-		String carModel = sc.nextLine();
-		System.out.println("Pickup (dd/MM/yyyy hh:mm): ");
-		LocalDateTime pickupDate = LocalDateTime.parse(sc.nextLine(), for1);
-		System.out.println("Return (dd/MM/yyyy hh:mm): ");
-		LocalDateTime returnDate = LocalDateTime.parse(sc.nextLine(), for1);
-		CarRental cr = new CarRental(pickupDate, returnDate, new Vehicle(carModel));
-		System.out.println("Enter price per hour: ");
-		double hourValue = sc.nextDouble();
-		System.out.println("Enter price per day: ");
-		double dayValue = sc.nextDouble();
-		RentalService rs = new RentalService(hourValue, dayValue, new BrazilTaxService());
-		rs.processInvoice(cr);
-		System.out.println("INVOICE:\nBasic payment: " + String.format("%.2f", cr.getInvoice().getBasicPayment()) + "\nTax: "
-				+ String.format("%.2f", cr.getInvoice().getTax()) + "\nTotal payment: "
-				+ String.format("%.2f", cr.getInvoice().getTotalPayment() ) );
+		final DateTimeFormatter for1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		System.out.println("Enter contract data");
+		System.out.println("Contract number: ");
+		int contractNumber = sc.nextInt();
+		sc.nextLine();
+		System.out.println("Date (dd/MM/yyyy): ");
+		LocalDate date = LocalDate.parse(sc.nextLine(), for1);
+		System.out.println("Contract value: ");
+		double value = sc.nextDouble();
 		
+		Contract c = new Contract(contractNumber, date, value);
+
+		PaymentService ps = new PaymentService(new PaypalTaxService());
+		System.out.println("In how many installments do you want to split the contract?");
+		int installmentsNumber = sc.nextInt();
+		ps.processContract(c, installmentsNumber);
+		System.out.println("Installments:");
+		for (Installment s : c.getInstallment())
+		{
+			System.out.println(s.toString());
+		}
+
 		sc.close();
 	}
 
