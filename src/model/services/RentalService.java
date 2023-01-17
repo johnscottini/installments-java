@@ -8,7 +8,7 @@ import model.entities.Invoice;
 public class RentalService {
 
 
-	public RentalService(Double pricePerHour, Double pricePerDay, BrazilTaxService taxService) {
+	public RentalService(Double pricePerHour, Double pricePerDay, TaxService taxService) {
 		super();
 		this.pricePerHour = pricePerHour;
 		this.pricePerDay = pricePerDay;
@@ -18,15 +18,18 @@ public class RentalService {
 	private Double pricePerHour;
 	private Double pricePerDay;
 	
-	public BrazilTaxService getTaxService() {
+	
+
+
+	private TaxService taxService;
+	public TaxService getTaxService() {
 		return taxService;
 	}
 
-	public void setTaxService(BrazilTaxService taxService) {
+	public void setTaxService(TaxService taxService) {
 		this.taxService = taxService;
 	}
 
-	private BrazilTaxService taxService;
 	public void processInvoice(CarRental carRental)
 	{
 		double minutes = Duration.between(carRental.getStart(), carRental.getFinish()).toMinutes();
